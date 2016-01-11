@@ -12,14 +12,23 @@ namespace Windows.Forms
     /// </summary>
     public class ThreeStateCheckBoxTreeView : TreeView
     {
+        public delegate void CheckedChangedHandler(TTreeViewEventArgs e);
+        public event CheckedChangedHandler CheckedChanged;
+        protected virtual void OnCheckedChanged(TTreeViewEventArgs e)
+        {
+            CheckedChangedHandler handler = CheckedChanged;
+            if (handler != null) handler(e);
+        }
+
+
         #region Fields
-        
+
         readonly ImageList _ilStateImages;
         bool _checkBoxesVisible;
         bool _preventCheckEvent;
 
         #endregion
-        
+
         #region Constructors
 
         /// <summary>
@@ -145,7 +154,7 @@ namespace Windows.Forms
         protected override void OnNodeMouseClick(TreeNodeMouseClickEventArgs e)
         {
             base.OnNodeMouseClick(e);
-
+            
             _preventCheckEvent = true;
 
             int iSpacing = ImageList == null ? 0 : 18;
@@ -168,11 +177,14 @@ namespace Windows.Forms
             do
             {															// let's pop node from stack,
                 tnBuffer = stNodes.Pop();									// inherit buffered node's
-                tnBuffer.Checked = e.Node.Checked;							// check state and push
+                tnBuffer.Checked = e.Node.Checked;                          // check state and push
+                tnBuffer.StateImageIndex = e.Node.Checked ? 1 : 0;
+                OnCheckedChanged(new TTreeViewEventArgs((TTreeNode)tnBuffer));
+
                 for (int i = 0; i < tnBuffer.Nodes.Count; i++)				// each child on the stack
                     stNodes.Push(tnBuffer.Nodes[i]);						// until there is no node
             } while (stNodes.Count > 0);									// left.
-
+            
             var bMixedState = false;
             tnBuffer = e.Node;												// re-buffer clicked node.
             while (tnBuffer.Parent != null)
@@ -187,10 +199,18 @@ namespace Windows.Forms
                 else
                     tnBuffer.Parent.StateImageIndex = iIndex;
                 tnBuffer = tnBuffer.Parent;									// finally buffer parent and
+
+                OnCheckedChanged(new TTreeViewEventArgs((TTreeNode)tnBuffer));
             }																// loop here.
 
             _preventCheckEvent = false;
+
+            // set this node StateImageIndex to 0 if not checked
+            if (!e.Node.Checked) e.Node.StateImageIndex = 0;
+            // raise checked changed event
+            OnCheckedChanged(new TTreeViewEventArgs((TTreeNode)e.Node));
         }
+
 
         #endregion
     }
