@@ -57,11 +57,9 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvTreeNode.vb" />
     <Compile Include="AdvTreeView.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="AdvTreeViewEventArgs.vb" />
     <Compile Include="AdvTreeViewExtensions.vb" />
     <Compile Include="CheckedState.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />

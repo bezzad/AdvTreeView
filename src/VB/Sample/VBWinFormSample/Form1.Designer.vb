@@ -51,6 +51,6 @@ Partial Class Form1
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents ThreeStateCheckBoxTreeView1 As Windows.Forms.Windows.Forms.AdvTreeView
+    Friend WithEvents ThreeStateCheckBoxTreeView1 As AdvTreeView
 
 End Class

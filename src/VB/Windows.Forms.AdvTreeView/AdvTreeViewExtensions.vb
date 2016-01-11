@@ -1,31 +1,9 @@
-﻿Imports System.Windows.Forms
+﻿
+Public Module AdvTreeViewExtensions
 
-Namespace Windows.Forms
-    Module AdvTreeViewExtensions
-        ''' <devdoc>
-        '''     Adds a new child node to this node.  Child node is positioned after siblings.
-        ''' </devdoc>
-        <System.Runtime.CompilerServices.Extension> _
-        Public Function Add(nodeCollection As TreeNodeCollection, node As AdvTreeNode) As AdvTreeNode
-            nodeCollection.Add(node)
-            Return node
-        End Function
+    <System.Runtime.CompilerServices.Extension> _
+    Public Function CheckedState(ByRef node As System.Windows.Forms.TreeNode) As CheckedState
+        Return DirectCast(node.StateImageIndex, CheckedState)
+    End Function
 
-        ''' <devdoc>
-        '''     Inserts a new child node on this node.  Child node is positioned as specified by index.
-        ''' </devdoc>
-        <System.Runtime.CompilerServices.Extension> _
-        Public Function Insert(nodeCollection As TreeNodeCollection, index As Integer, node As AdvTreeNode) As AdvTreeNode
-            nodeCollection.Insert(index, node)
-            Return node
-        End Function
-
-        ''' <devdoc>
-        '''    <para>[To be supplied.]</para>
-        ''' </devdoc>
-        <System.Runtime.CompilerServices.Extension> _
-        Public Sub AddRange(nodeCollection As TreeNodeCollection, nodes As AdvTreeNode())
-            nodeCollection.AddRange(nodes)
-        End Sub
-    End Module
-End Namespace
+End Module

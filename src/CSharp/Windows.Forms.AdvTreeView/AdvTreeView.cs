@@ -14,9 +14,9 @@ namespace Windows.Forms
     {
         #region Events
         
-        public delegate void CheckedChangedHandler(AdvTreeViewEventArgs e);
+        public delegate void CheckedChangedHandler(TreeViewEventArgs e);
         public event CheckedChangedHandler CheckedChanged;
-        protected virtual void OnCheckedChanged(AdvTreeViewEventArgs e)
+        protected virtual void OnCheckedChanged(TreeViewEventArgs e)
         {
             CheckedChangedHandler handler = CheckedChanged;
             if (handler != null) handler(e);
@@ -182,7 +182,7 @@ namespace Windows.Forms
                 tnBuffer = stNodes.Pop();									// inherit buffered node's
                 tnBuffer.Checked = e.Node.Checked;                          // check state and push
                 tnBuffer.StateImageIndex = e.Node.Checked ? 1 : 0;
-                OnCheckedChanged(new AdvTreeViewEventArgs((AdvTreeNode)tnBuffer));
+                OnCheckedChanged(new TreeViewEventArgs(tnBuffer));
 
                 for (int i = 0; i < tnBuffer.Nodes.Count; i++)				// each child on the stack
                     stNodes.Push(tnBuffer.Nodes[i]);						// until there is no node
@@ -203,7 +203,7 @@ namespace Windows.Forms
                     tnBuffer.Parent.StateImageIndex = iIndex;
                 tnBuffer = tnBuffer.Parent;									// finally buffer parent and
 
-                OnCheckedChanged(new AdvTreeViewEventArgs((AdvTreeNode)tnBuffer));
+                OnCheckedChanged(new TreeViewEventArgs(tnBuffer));
             }																// loop here.
 
             _preventCheckEvent = false;
@@ -211,7 +211,7 @@ namespace Windows.Forms
             // set this node StateImageIndex to 0 if not checked
             if (!e.Node.Checked) e.Node.StateImageIndex = 0;
             // raise checked changed event
-            OnCheckedChanged(new AdvTreeViewEventArgs((AdvTreeNode)e.Node));
+            OnCheckedChanged(new TreeViewEventArgs(e.Node));
         }
 
 
