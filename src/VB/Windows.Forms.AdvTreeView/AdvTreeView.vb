@@ -5,21 +5,21 @@ Imports System.Windows.Forms
 Imports System.Windows.Forms.VisualStyles
 
 Namespace Windows.Forms
-
     ''' <summary>
     ''' Provides a tree view control supporting three state checkboxes.
     ''' </summary>
-    Public Class ThreeStateCheckBoxTreeView
+    Public Class AdvTreeView
         Inherits TreeView
-        
 
-        Public Delegate Sub CheckedChangedHandler(e As TTreeViewEventArgs)
+#Region "Events"
+
+        Public Delegate Sub CheckedChangedHandler(e As AdvTreeViewEventArgs)
         Public Event CheckedChanged As CheckedChangedHandler
-        Protected Overridable Sub OnCheckedChanged(e As TTreeViewEventArgs)
+        Protected Overridable Sub OnCheckedChanged(e As AdvTreeViewEventArgs)
             RaiseEvent CheckedChanged(e)
         End Sub
 
-
+#End Region
 
 #Region "Fields"
 
@@ -213,7 +213,7 @@ Namespace Windows.Forms
                 tnBuffer.Checked = e.Node.Checked
                 ' check state and push
                 tnBuffer.StateImageIndex = If(e.Node.Checked, 1, 0)
-                OnCheckedChanged(New TTreeViewEventArgs(DirectCast(tnBuffer, TTreeNode)))
+                OnCheckedChanged(New AdvTreeViewEventArgs(DirectCast(tnBuffer, AdvTreeNode)))
 
                 For i As Integer = 0 To tnBuffer.Nodes.Count - 1
                     ' each child on the stack
@@ -244,7 +244,7 @@ Namespace Windows.Forms
                 End If
                 tnBuffer = tnBuffer.Parent
                 ' finally buffer parent and
-                OnCheckedChanged(New TTreeViewEventArgs(DirectCast(tnBuffer, TTreeNode)))
+                OnCheckedChanged(New AdvTreeViewEventArgs(DirectCast(tnBuffer, AdvTreeNode)))
             End While
             ' loop here.
             _preventCheckEvent = False
@@ -254,110 +254,11 @@ Namespace Windows.Forms
                 e.Node.StateImageIndex = 0
             End If
             ' raise checked changed event
-            OnCheckedChanged(New TTreeViewEventArgs(DirectCast(e.Node, TTreeNode)))
+            OnCheckedChanged(New AdvTreeViewEventArgs(DirectCast(e.Node, AdvTreeNode)))
         End Sub
 
 
 #End Region
+
     End Class
-
-
-
-    ' <remarks>
-    ' CheckedState is an enum of all allowable nodes states
-    ' </remarks>
-    Public Enum CheckedState As Integer
-        UnInitialised = -1
-        UnChecked
-        Checked
-        Mixed
-    End Enum
-
-
-    Public Class TTreeNode
-        Inherits TreeNode
-#Region "Properties"
-
-        ''' <summary>
-        ''' Gets or sets three state checkbox tree node value.
-        ''' </summary>
-        <Category("Appearance"), Description("Sets tree view node three state checkboxes checked value."), DefaultValue(CheckedState.UnChecked)> _
-        Public Shadows Property Checked() As CheckedState
-            Get
-                Return DirectCast(StateImageIndex, CheckedState)
-            End Get
-            Set(value As CheckedState)
-                StateImageIndex = CInt(value)
-            End Set
-        End Property
-
-#End Region
-
-#Region "Constructors"
-
-        ''' <devdoc> 
-        '''     Creates a TreeNode object. 
-        ''' </devdoc>
-        Public Sub New()
-        End Sub
-
-        ''' <devdoc> 
-        '''     Creates a TreeNode object. 
-        ''' </devdoc>
-        Public Sub New(text As String)
-            MyBase.New(text)
-        End Sub
-
-        ''' <devdoc>
-        '''     Creates a TreeNode object. 
-        ''' </devdoc>
-        Public Sub New(text As String, children As TreeNode())
-            MyBase.New(text, children)
-        End Sub
-
-        ''' <devdoc>
-        '''     Creates a TreeNode object. 
-        ''' </devdoc>
-        Public Sub New(text As String, imageIndex As Integer, selectedImageIndex As Integer)
-            MyBase.New(text, imageIndex, selectedImageIndex)
-        End Sub
-
-        ''' <devdoc> 
-        '''     Creates a TreeNode object.
-        ''' </devdoc>
-        Public Sub New(text As String, imageIndex As Integer, selectedImageIndex As Integer, children As TreeNode())
-            MyBase.New(text, imageIndex, selectedImageIndex, children)
-        End Sub
-
-#End Region
-    End Class
-
-
-    ''' <devdoc>
-    '''    <para>
-    '''       Provides data for the <see cref='Windows.Forms.ThreeStateCheckBoxTreeView.OnCheckedChanged'/> event. 
-    '''    </para>
-    ''' </devdoc> 
-    Public Class TTreeViewEventArgs
-        Inherits EventArgs
-        Private m_node As TTreeNode
-
-        ''' <devdoc>
-        '''    <para>[To be supplied.]</para> 
-        ''' </devdoc>
-        Public Sub New(node As TTreeNode)
-            Me.m_node = node
-        End Sub
-
-        ''' <devdoc>
-        '''    <para>[To be supplied.]</para>
-        ''' </devdoc> 
-        Public ReadOnly Property Node() As TTreeNode
-            Get
-                Return m_node
-            End Get
-        End Property
-    End Class
-
-
 End Namespace

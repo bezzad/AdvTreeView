@@ -5,13 +5,13 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Windows.Forms.ThreeStateCheckBoxTreeView")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("Windows.Forms.AdvTreeView")]
+[assembly: AssemblyDescription("Three State CheckBoxes in TreeView")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Windows.Forms.ThreeStateCheckBoxTreeView")]
-[assembly: AssemblyCopyright("Copyright ©  2016")]
-[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCompany("Xomorod")]
+[assembly: AssemblyProduct("Windows.Forms.AdvTreeView")]
+[assembly: AssemblyCopyright("Copyright ©  Xomorod 2016")]
+[assembly: AssemblyTrademark("Xomorod")]
 [assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 

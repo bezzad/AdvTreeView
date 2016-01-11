@@ -1,4 +1,6 @@
-﻿Imports Windows.Forms.Windows.Forms
+﻿
+Imports Windows.Forms
+Imports Windows.Forms.Windows.Forms
 
 Partial Public Class Form1
     Inherits Form
@@ -11,30 +13,30 @@ Partial Public Class Form1
     Protected Overrides Sub OnLoad(e As EventArgs)
         MyBase.OnLoad(e)
 
-        Dim treeNode1 = New TTreeNode("Node0")
-        Dim treeNode2 = New TTreeNode("Node5")
-        Dim treeNode3 = New TTreeNode("Node8")
-        Dim treeNode4 = New TTreeNode("Node9")
-        Dim treeNode5 = New TTreeNode("Node10")
-        Dim treeNode6 = New TTreeNode("Node6", New TTreeNode() {treeNode3, treeNode4, treeNode5})
-        Dim treeNode7 = New TTreeNode("Node7")
-        Dim treeNode8 = New TTreeNode("Node1", New TTreeNode() {treeNode2, treeNode6, treeNode7})
-        Dim treeNode9 = New TTreeNode("Node2")
-        Dim treeNode10 = New TTreeNode("Node11")
-        Dim treeNode11 = New TTreeNode("Node12")
-        Dim treeNode12 = New TTreeNode("Node14")
-        Dim treeNode13 = New TTreeNode("Node19")
-        Dim treeNode14 = New TTreeNode("Node20")
-        Dim treeNode15 = New TTreeNode("Node17", New TTreeNode() {treeNode13, treeNode14})
-        Dim treeNode16 = New TTreeNode("Node18")
-        Dim treeNode17 = New TTreeNode("Node15", New TTreeNode() {treeNode15, treeNode16})
-        Dim treeNode18 = New TTreeNode("Node16")
-        Dim treeNode19 = New TTreeNode("Node13", New TTreeNode() {treeNode12, treeNode17, treeNode18})
-        Dim treeNode20 = New TTreeNode("Node3", New TTreeNode() {treeNode10, treeNode11, treeNode19})
-        Dim treeNode21 = New TTreeNode("Node4")
+        Dim treeNode1 = New AdvTreeNode("Node0")
+        Dim treeNode2 = New AdvTreeNode("Node5")
+        Dim treeNode3 = New AdvTreeNode("Node8")
+        Dim treeNode4 = New AdvTreeNode("Node9")
+        Dim treeNode5 = New AdvTreeNode("Node10")
+        Dim treeNode6 = New AdvTreeNode("Node6", New AdvTreeNode() {treeNode3, treeNode4, treeNode5})
+        Dim treeNode7 = New AdvTreeNode("Node7")
+        Dim treeNode8 = New AdvTreeNode("Node1", New AdvTreeNode() {treeNode2, treeNode6, treeNode7})
+        Dim treeNode9 = New AdvTreeNode("Node2")
+        Dim treeNode10 = New AdvTreeNode("Node11")
+        Dim treeNode11 = New AdvTreeNode("Node12")
+        Dim treeNode12 = New AdvTreeNode("Node14")
+        Dim treeNode13 = New AdvTreeNode("Node19")
+        Dim treeNode14 = New AdvTreeNode("Node20")
+        Dim treeNode15 = New AdvTreeNode("Node17", New AdvTreeNode() {treeNode13, treeNode14})
+        Dim treeNode16 = New AdvTreeNode("Node18")
+        Dim treeNode17 = New AdvTreeNode("Node15", New AdvTreeNode() {treeNode15, treeNode16})
+        Dim treeNode18 = New AdvTreeNode("Node16")
+        Dim treeNode19 = New AdvTreeNode("Node13", New AdvTreeNode() {treeNode12, treeNode17, treeNode18})
+        Dim treeNode20 = New AdvTreeNode("Node3", New AdvTreeNode() {treeNode10, treeNode11, treeNode19})
+        Dim treeNode21 = New AdvTreeNode("Node4")
 
         treeNode1.Name = "Node0"
-        treeNode1.Checked = CheckedState.UnChecked
+        treeNode1.Checked = CheckedState.Unchecked
         treeNode1.Text = "Node0"
         treeNode2.Name = "Node5"
         treeNode2.Checked = CheckedState.UnChecked
@@ -98,11 +100,11 @@ Partial Public Class Form1
         treeNode21.Text = "Node4"
 
 
-        ThreeStateCheckBoxTreeView1.Nodes.AddRange(New TTreeNode() {treeNode1, treeNode8, treeNode9, treeNode20, treeNode21})
+        ThreeStateCheckBoxTreeView1.Nodes.AddRange(New AdvTreeNode() {treeNode1, treeNode8, treeNode9, treeNode20, treeNode21})
     End Sub
 
 
-    Private Sub threeStateCheckBoxTreeView1_CheckedChanged(e As TTreeViewEventArgs)
+    Private Sub threeStateCheckBoxTreeView1_CheckedChanged(e As AdvTreeViewEventArgs)
         e.Node.Text = e.Node.Checked.ToString()
     End Sub
 End Class

@@ -4,17 +4,17 @@ namespace Windows.Forms
 {
     /// <devdoc>
     ///    <para>
-    ///       Provides data for the <see cref='Windows.Forms.ThreeStateCheckBoxTreeView.OnCheckedChanged'/> event. 
+    ///       Provides data for the <see cref='Windows.Forms.AdvTreeView.OnCheckedChanged'/> event. 
     ///    </para>
     /// </devdoc> 
-    public class TTreeViewEventArgs : EventArgs
+    public class AdvTreeViewEventArgs : EventArgs
     {
-        TTreeNode node;
+        AdvTreeNode node;
 
         /// <devdoc>
         ///    <para>[To be supplied.]</para> 
         /// </devdoc>
-        public TTreeViewEventArgs(TTreeNode node)
+        public AdvTreeViewEventArgs(AdvTreeNode node)
         {
             this.node = node;
         }
@@ -22,7 +22,7 @@ namespace Windows.Forms
         /// <devdoc>
         ///    <para>[To be supplied.]</para>
         /// </devdoc> 
-        public TTreeNode Node
+        public AdvTreeNode Node
         {
             get
             {

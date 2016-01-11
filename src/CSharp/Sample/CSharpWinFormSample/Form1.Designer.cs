@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.threeStateCheckBoxTreeView1 = new Windows.Forms.ThreeStateCheckBoxTreeView();
+            this.threeStateCheckBoxTreeView1 = new Windows.Forms.AdvTreeView();
             this.SuspendLayout();
             // 
             // threeStateCheckBoxTreeView1
@@ -56,7 +56,7 @@
 
         #endregion
 
-        private Windows.Forms.ThreeStateCheckBoxTreeView threeStateCheckBoxTreeView1;
+        private Windows.Forms.AdvTreeView threeStateCheckBoxTreeView1;
     }
 }
 

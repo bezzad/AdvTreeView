@@ -8,12 +8,12 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("Windows.Forms.ThreeStateCheckBoxTreeView")> 
-<Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("")> 
-<Assembly: AssemblyProduct("Windows.Forms.ThreeStateCheckBoxTreeView")> 
-<Assembly: AssemblyCopyright("Copyright ©  2016")> 
-<Assembly: AssemblyTrademark("")> 
+<Assembly: AssemblyTitle("Windows.Forms.AdvTreeView")> 
+<Assembly: AssemblyDescription("Three State CheckBox TreeView")> 
+<Assembly: AssemblyCompany("Xomorod")> 
+<Assembly: AssemblyProduct("Windows.Forms.AdvTreeView")> 
+<Assembly: AssemblyCopyright("Copyright ©  Xomorod 2016")> 
+<Assembly: AssemblyTrademark("Xomorod")> 
 
 <Assembly: ComVisible(False)>
 

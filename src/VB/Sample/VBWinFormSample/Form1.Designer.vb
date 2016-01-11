@@ -1,4 +1,7 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿Imports Windows.Forms
+Imports Windows.Forms.Windows.Forms
+
+<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
 Partial Class Form1
     Inherits System.Windows.Forms.Form
 
@@ -23,7 +26,7 @@ Partial Class Form1
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Me.ThreeStateCheckBoxTreeView1 = New Windows.Forms.Windows.Forms.ThreeStateCheckBoxTreeView()
+        Me.ThreeStateCheckBoxTreeView1 = New AdvTreeView()
         Me.SuspendLayout()
         '
         'ThreeStateCheckBoxTreeView1
@@ -48,6 +51,6 @@ Partial Class Form1
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents ThreeStateCheckBoxTreeView1 As Windows.Forms.Windows.Forms.ThreeStateCheckBoxTreeView
+    Friend WithEvents ThreeStateCheckBoxTreeView1 As Windows.Forms.Windows.Forms.AdvTreeView
 
 End Class

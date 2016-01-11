@@ -17,55 +17,55 @@ namespace CSharpWinFormSample
         {
             base.OnLoad(e);
 
-            var treeNode1 = new TTreeNode("Node0");
-            var treeNode2 = new TTreeNode("Node5");
-            var treeNode3 = new TTreeNode("Node8");
-            var treeNode4 = new TTreeNode("Node9");
-            var treeNode5 = new TTreeNode("Node10");
-            var treeNode6 = new TTreeNode("Node6", new[]
+            var treeNode1 = new AdvTreeNode("Node0");
+            var treeNode2 = new AdvTreeNode("Node5");
+            var treeNode3 = new AdvTreeNode("Node8");
+            var treeNode4 = new AdvTreeNode("Node9");
+            var treeNode5 = new AdvTreeNode("Node10");
+            var treeNode6 = new AdvTreeNode("Node6", new[]
             {
                 treeNode3,
                 treeNode4,
                 treeNode5
             });
-            var treeNode7 = new TTreeNode("Node7");
-            var treeNode8 = new TTreeNode("Node1", new[]
+            var treeNode7 = new AdvTreeNode("Node7");
+            var treeNode8 = new AdvTreeNode("Node1", new[]
             {
                 treeNode2,
                 treeNode6,
                 treeNode7
             });
-            var treeNode9 = new TTreeNode("Node2");
-            var treeNode10 = new TTreeNode("Node11");
-            var treeNode11 = new TTreeNode("Node12");
-            var treeNode12 = new TTreeNode("Node14");
-            var treeNode13 = new TTreeNode("Node19");
-            var treeNode14 = new TTreeNode("Node20");
-            var treeNode15 = new TTreeNode("Node17", new[]
+            var treeNode9 = new AdvTreeNode("Node2");
+            var treeNode10 = new AdvTreeNode("Node11");
+            var treeNode11 = new AdvTreeNode("Node12");
+            var treeNode12 = new AdvTreeNode("Node14");
+            var treeNode13 = new AdvTreeNode("Node19");
+            var treeNode14 = new AdvTreeNode("Node20");
+            var treeNode15 = new AdvTreeNode("Node17", new[]
             {
                 treeNode13,
                 treeNode14
             });
-            var treeNode16 = new TTreeNode("Node18");
-            var treeNode17 = new TTreeNode("Node15", new[]
+            var treeNode16 = new AdvTreeNode("Node18");
+            var treeNode17 = new AdvTreeNode("Node15", new[]
             {
                 treeNode15,
                 treeNode16
             });
-            var treeNode18 = new TTreeNode("Node16");
-            var treeNode19 = new TTreeNode("Node13", new[]
+            var treeNode18 = new AdvTreeNode("Node16");
+            var treeNode19 = new AdvTreeNode("Node13", new[]
             {
                 treeNode12,
                 treeNode17,
                 treeNode18
             });
-            var treeNode20 = new TTreeNode("Node3", new[]
+            var treeNode20 = new AdvTreeNode("Node3", new[]
             {
                 treeNode10,
                 treeNode11,
                 treeNode19
             });
-            var treeNode21 = new TTreeNode("Node4");
+            var treeNode21 = new AdvTreeNode("Node4");
 
             treeNode1.Name = "Node0";
             treeNode1.Checked = CheckedState.UnChecked;
@@ -132,7 +132,7 @@ namespace CSharpWinFormSample
             treeNode21.Text = "Node4";
 
 
-            threeStateCheckBoxTreeView1.Nodes.AddRange(new TreeNode[]
+            threeStateCheckBoxTreeView1.Nodes.AddRange(new AdvTreeNode[]
             {
                 treeNode1,
                 treeNode8,
@@ -143,7 +143,7 @@ namespace CSharpWinFormSample
         }
 
         
-        private void threeStateCheckBoxTreeView1_CheckedChanged(TTreeViewEventArgs e)
+        private void threeStateCheckBoxTreeView1_CheckedChanged(AdvTreeViewEventArgs e)
         {
             e.Node.Text = e.Node.Checked.ToString();
         }

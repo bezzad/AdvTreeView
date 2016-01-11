@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace Windows.Forms
 {
-    public class TTreeNode : TreeNode
+    public class AdvTreeNode : TreeNode
     {
         #region Properties
         
@@ -24,27 +24,27 @@ namespace Windows.Forms
         /// <devdoc> 
         ///     Creates a TreeNode object. 
         /// </devdoc>
-        public TTreeNode() { }
+        public AdvTreeNode() { }
 
         /// <devdoc> 
         ///     Creates a TreeNode object. 
         /// </devdoc>
-        public TTreeNode(string text) : base(text) { }
+        public AdvTreeNode(string text) : base(text) { }
 
         /// <devdoc>
         ///     Creates a TreeNode object. 
         /// </devdoc>
-        public TTreeNode(string text, TreeNode[] children) : base(text, children) { }
+        public AdvTreeNode(string text, AdvTreeNode[] children) : base(text, children) { }
 
         /// <devdoc>
         ///     Creates a TreeNode object. 
         /// </devdoc>
-        public TTreeNode(string text, int imageIndex, int selectedImageIndex) : base(text, imageIndex, selectedImageIndex) { }
+        public AdvTreeNode(string text, int imageIndex, int selectedImageIndex) : base(text, imageIndex, selectedImageIndex) { }
 
         /// <devdoc> 
         ///     Creates a TreeNode object.
         /// </devdoc>
-        public TTreeNode(string text, int imageIndex, int selectedImageIndex, TreeNode[] children) : base(text, imageIndex, selectedImageIndex, children) { }
+        public AdvTreeNode(string text, int imageIndex, int selectedImageIndex, AdvTreeNode[] children) : base(text, imageIndex, selectedImageIndex, children) { }
 
         #endregion
     }

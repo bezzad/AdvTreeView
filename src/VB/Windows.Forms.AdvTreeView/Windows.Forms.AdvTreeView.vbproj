@@ -7,10 +7,11 @@
     <ProjectGuid>{647CF1FC-2506-44A3-8662-680F2A2A2778}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Windows.Forms</RootNamespace>
-    <AssemblyName>Windows.Forms.ThreeStateCheckBoxTreeView</AssemblyName>
+    <AssemblyName>Windows.Forms.AdvTreeView</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Windows</MyType>
-    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -18,7 +19,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Windows.Forms.ThreeStateCheckBoxTreeView.xml</DocumentationFile>
+    <DocumentationFile>Windows.Forms.AdvTreeView.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -27,7 +28,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Windows.Forms.ThreeStateCheckBoxTreeView.xml</DocumentationFile>
+    <DocumentationFile>Windows.Forms.AdvTreeView.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -56,9 +57,13 @@
     <Import Include="System.Diagnostics" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ThreeStateCheckBoxTreeView.vb">
+    <Compile Include="AdvTreeNode.vb" />
+    <Compile Include="AdvTreeView.vb">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="AdvTreeViewEventArgs.vb" />
+    <Compile Include="AdvTreeViewExtensions.vb" />
+    <Compile Include="CheckedState.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>
