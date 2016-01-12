@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.VisualStyles;
 
@@ -13,7 +14,14 @@ namespace Windows.Forms
     public class AdvTreeView : TreeView
     {
         #region Events
-        
+
+        /// <summary>
+        /// Validate node must checked or not ? and get not check cause message
+        /// </summary>
+        /// <param name="e">Current checked Node</param>
+        /// <returns>Why must not check error message. if must checked and not any error then return null</returns>
+        public delegate string NodeValidation(TreeNode e);
+
         public delegate void CheckedChangedHandler(TreeViewEventArgs e);
         public event CheckedChangedHandler CheckedChanged;
         protected virtual void OnCheckedChanged(TreeViewEventArgs e)
@@ -26,9 +34,10 @@ namespace Windows.Forms
 
         #region Fields
 
-        readonly ImageList _ilStateImages;
-        bool _checkBoxesVisible;
-        bool _preventCheckEvent;
+        private readonly ImageList _ilStateImages;
+        private readonly List<string> _errorNodes;
+        private bool _checkBoxesVisible;
+        private bool _preventCheckEvent;
 
         #endregion
 
@@ -40,6 +49,12 @@ namespace Windows.Forms
         /// </summary>
         public AdvTreeView()
         {
+            _errorNodes = new List<string>();
+            NodeErrorDuration = 3000;
+            ErrorForeColor = Color.Crimson;
+            ParentNodeSelectError = @"Parent not selectable class!";
+            SiblingNodeSelectError = @"The ({0}) is a selected sibling node was found!";
+
             _ilStateImages = new ImageList();											// first we create our state image
             var cbsState = CheckBoxState.UncheckedNormal;
 
@@ -60,7 +75,7 @@ namespace Windows.Forms
                 CheckBoxesThreeState = true;
             }
         }
-
+        
         #endregion
 
         #region Properties
@@ -97,13 +112,51 @@ namespace Windows.Forms
         [Category("Appearance"), Description("Sets tree view to use three state checkboxes or not."), DefaultValue(true)]
         public bool CheckBoxesThreeState { get; set; }
 
+        /// <summary>
+        /// Gets or sets to no support multi sibling checks.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets to no support multi sibling checks."), DefaultValue(false)]
+        public bool SiblingLimitSelection { get; set; }
+
+        /// <summary>
+        /// Gets or sets Parent select error message.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets Parent select error message.")]
+        public string ParentNodeSelectError { get; set; }
+
+        /// <summary>
+        /// Gets or sets Sibling select error message.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets Sibling select error message.")]
+        public string SiblingNodeSelectError { get; set; }
+
+        /// <summary>
+        /// Gets or sets select error duration per millisecond.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets select error duration per millisecond.")]
+        public int NodeErrorDuration { get; set; }
+
+        /// <summary>
+        /// Gets or sets select error ForeColor.
+        /// </summary>
+        [Category("Appearance"), Description("Gets or sets select error ForeColor.")]
+        public Color ErrorForeColor { get; set; }
+
+        /// <summary>
+        /// TreeNode validator for define selected node must checked or not ? and get not check cause message
+        /// </summary>
+        /// <value>
+        /// The check node validation.
+        /// </value>
+        [Browsable(false)]
+        public NodeValidation CheckNodeValidation { get; set; }
+
         #endregion
 
         #region Methods
 
         /// <summary>
-        /// Refreshes this
-        /// control.
+        /// Refreshes this control.
         /// </summary>
         public override void Refresh()
         {
@@ -157,63 +210,128 @@ namespace Windows.Forms
         protected override void OnNodeMouseClick(TreeNodeMouseClickEventArgs e)
         {
             base.OnNodeMouseClick(e);
-            
-            _preventCheckEvent = true;
 
-            int iSpacing = ImageList == null ? 0 : 18;
-            if ((e.X > e.Node.Bounds.Left - iSpacing ||						// *not* used by the state
-                 e.X < e.Node.Bounds.Left - (iSpacing + 16)) &&				// image we can leave here.
-                 e.Button != MouseButtons.None)
-            { return; }
+            try
+            {
+                _preventCheckEvent = true;
 
-            var tnBuffer = e.Node;
-            if (e.Button == MouseButtons.Left)								// flip its check state.
-                tnBuffer.Checked = !tnBuffer.Checked;
+                if (!e.Node.Checked && SiblingLimitSelection) // not checked show before clicking mode and is not current state
+                {
+                    if (e.Node.GetNodeCount(false) > 0) // is nested node ?
+                    {
+                        e.Node.Checked = false;
+                        SetError(e.Node, ParentNodeSelectError);
+                        return;
+                    }
 
-            tnBuffer.StateImageIndex = tnBuffer.Checked ?					// set state image index
-                                        1 : tnBuffer.StateImageIndex;		// correctly.
+                    TreeNode sibling;
+                    if ((sibling = e.Node.GetFirstCheckedSiblingNode()) != null) // check sibling selections
+                    {
+                        e.Node.Checked = false;
+                        SetError(e.Node, SiblingNodeSelectError, sibling.Text);
+                        return;
+                    }
 
-            OnAfterCheck(new TreeViewEventArgs(tnBuffer, TreeViewAction.ByMouse));
+                    if (CheckNodeValidation != null)
+                    {
+                        string errorMsg = CheckNodeValidation(e.Node);
+                        if (errorMsg != null)
+                        {
+                            e.Node.Checked = false;
+                            SetError(e.Node, errorMsg);
+                            return;
+                        }
+                    }
+                }
 
-            var stNodes = new Stack<TreeNode>(tnBuffer.Nodes.Count);
-            stNodes.Push(tnBuffer);											// push buffered node first.
-            do
-            {															// let's pop node from stack,
-                tnBuffer = stNodes.Pop();									// inherit buffered node's
-                tnBuffer.Checked = e.Node.Checked;                          // check state and push
-                tnBuffer.StateImageIndex = e.Node.Checked ? 1 : 0;
-                OnCheckedChanged(new TreeViewEventArgs(tnBuffer));
+                int iSpacing = ImageList == null ? 0 : 18;
+                if ((e.X > e.Node.Bounds.Left - iSpacing || // *not* used by the state
+                     e.X < e.Node.Bounds.Left - (iSpacing + 16)) && // image we can leave here.
+                    e.Button != MouseButtons.None)
+                {
+                    return;
+                }
 
-                for (int i = 0; i < tnBuffer.Nodes.Count; i++)				// each child on the stack
-                    stNodes.Push(tnBuffer.Nodes[i]);						// until there is no node
-            } while (stNodes.Count > 0);									// left.
-            
-            var bMixedState = false;
-            tnBuffer = e.Node;												// re-buffer clicked node.
-            while (tnBuffer.Parent != null)
-            {								// while we get a parent we
-                foreach (TreeNode tnChild in tnBuffer.Parent.Nodes)			// determine mixed check states
-                    bMixedState |= (tnChild.Checked != tnBuffer.Checked |	// and convert current check
-                                    tnChild.StateImageIndex == 2);			// state to state image index.
-                var iIndex = (int)Convert.ToUInt32(tnBuffer.Checked);
-                tnBuffer.Parent.Checked = bMixedState || (iIndex > 0);		// state image in dependency
-                if (bMixedState)											// of mixed state.
-                    tnBuffer.Parent.StateImageIndex = CheckBoxesThreeState ? 2 : 1;
-                else
-                    tnBuffer.Parent.StateImageIndex = iIndex;
-                tnBuffer = tnBuffer.Parent;									// finally buffer parent and
+                var tnBuffer = e.Node;
+                if (e.Button == MouseButtons.Left) // flip its check state.
+                    tnBuffer.Checked = !tnBuffer.Checked;
 
-                OnCheckedChanged(new TreeViewEventArgs(tnBuffer));
-            }																// loop here.
+                tnBuffer.StateImageIndex = tnBuffer.Checked
+                    ? // set state image index
+                    1 : tnBuffer.StateImageIndex; // correctly.
 
-            _preventCheckEvent = false;
+                OnAfterCheck(new TreeViewEventArgs(tnBuffer, TreeViewAction.ByMouse));
 
-            // set this node StateImageIndex to 0 if not checked
-            if (!e.Node.Checked) e.Node.StateImageIndex = 0;
-            // raise checked changed event
-            OnCheckedChanged(new TreeViewEventArgs(e.Node));
+                var stNodes = new Stack<TreeNode>(tnBuffer.Nodes.Count);
+                stNodes.Push(tnBuffer); // push buffered node first.
+                do
+                {
+                    // let's pop node from stack,
+                    tnBuffer = stNodes.Pop(); // inherit buffered node's
+                    tnBuffer.Checked = e.Node.Checked; // check state and push
+                    tnBuffer.StateImageIndex = e.Node.Checked ? 1 : 0;
+                    OnCheckedChanged(new TreeViewEventArgs(tnBuffer));
+
+                    for (int i = 0; i < tnBuffer.Nodes.Count; i++) // each child on the stack
+                        stNodes.Push(tnBuffer.Nodes[i]); // until there is no node
+                } while (stNodes.Count > 0); // left.
+
+                var bMixedState = false;
+                tnBuffer = e.Node; // re-buffer clicked node.
+                while (tnBuffer.Parent != null)
+                {
+                    // while we get a parent we
+                    foreach (TreeNode tnChild in tnBuffer.Parent.Nodes) // determine mixed check states
+                        bMixedState |= (tnChild.Checked != tnBuffer.Checked | // and convert current check
+                                        tnChild.StateImageIndex == 2); // state to state image index.
+                    var iIndex = (int)Convert.ToUInt32(tnBuffer.Checked);
+                    tnBuffer.Parent.Checked = bMixedState || (iIndex > 0); // state image in dependency
+                    if (bMixedState) // of mixed state.
+                        tnBuffer.Parent.StateImageIndex = CheckBoxesThreeState ? 2 : 1;
+                    else
+                        tnBuffer.Parent.StateImageIndex = iIndex;
+                    tnBuffer = tnBuffer.Parent; // finally buffer parent and
+
+                    OnCheckedChanged(new TreeViewEventArgs(tnBuffer));
+                } // loop here.
+
+                // set this node StateImageIndex to 0 if not checked
+                if (!e.Node.Checked) e.Node.StateImageIndex = 0;
+                // raise checked changed event
+                OnCheckedChanged(new TreeViewEventArgs(e.Node));
+            }
+            finally
+            {
+                _preventCheckEvent = false;
+            }
         }
 
+        protected async void SetError(TreeNode node, string errorText, params object[] errorParams)
+        {
+            lock (node)
+            {
+                if (_errorNodes.Contains(node.GetUniqueValue())) return;
+                _errorNodes.Add(node.GetUniqueValue());
+            }
+
+            try
+            {
+                var tBuffer = node.Text;
+                var cBuffer = node.ForeColor;
+
+                node.ForeColor = ErrorForeColor;
+                node.Text += string.Format(" ({0})", string.Format(errorText, errorParams));
+
+                await Task.Delay(NodeErrorDuration);
+
+                node.ForeColor = cBuffer;
+                node.Text = tBuffer;
+            }
+            finally
+            {
+                _errorNodes.Remove(node.GetUniqueValue());
+            }
+        }
 
         #endregion
     }

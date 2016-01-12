@@ -10,7 +10,11 @@ namespace CSharpWinFormSample
         {
             InitializeComponent();
 
-            threeStateCheckBoxTreeView1.CheckedChanged += threeStateCheckBoxTreeView1_CheckedChanged;
+            advTree.CheckedChanged += advTree_CheckedChanged;
+            txtParentSelectError.Text = advTree.ParentNodeSelectError;
+            txtSiblingSelectError.Text = advTree.SiblingNodeSelectError;
+            numErrorDuration.Value = 3000;
+            advTree.CheckNodeValidation = NodeValidation;
         }
 
         protected override void OnLoad(EventArgs e)
@@ -111,7 +115,7 @@ namespace CSharpWinFormSample
             treeNode21.Text = "Node4";
 
 
-            threeStateCheckBoxTreeView1.Nodes.AddRange(new TreeNode[]
+            advTree.Nodes.AddRange(new TreeNode[]
             {
                 treeNode1,
                 treeNode8,
@@ -120,17 +124,42 @@ namespace CSharpWinFormSample
                 treeNode21
             });
 
-            foreach (TreeNode node in threeStateCheckBoxTreeView1.Nodes)
+            foreach (TreeNode node in advTree.Nodes)
             {
                 node.Checked = false;
             }
-            
+
         }
 
-        
-        private void threeStateCheckBoxTreeView1_CheckedChanged(TreeViewEventArgs e)
+
+        private void advTree_CheckedChanged(TreeViewEventArgs e)
         {
-            e.Node.Text = e.Node.CheckState().ToString();
+            e.Node.Text = e.Node.Index + e.Node.CheckState().ToString();
+        }
+
+        private void chkSiblingCheckLimitation_CheckedChanged(object sender, EventArgs e)
+        {
+            advTree.SiblingLimitSelection = ((CheckBox)sender).Checked;
+        }
+
+        private void txtSiblingSelectError_TextChanged(object sender, EventArgs e)
+        {
+            advTree.SiblingNodeSelectError = txtSiblingSelectError.Text;
+        }
+
+        private void txtParentSelectError_TextChanged(object sender, EventArgs e)
+        {
+            advTree.ParentNodeSelectError = txtParentSelectError.Text;
+        }
+
+        private void numErrorDuration_ValueChanged(object sender, EventArgs e)
+        {
+            advTree.NodeErrorDuration = (int)numErrorDuration.Value;
+        }
+
+        private string NodeValidation(TreeNode e)
+        {
+            return e.Text.Contains("0UnChecked") ? "This is not valid" : null;
         }
     }
 }

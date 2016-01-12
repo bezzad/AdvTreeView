@@ -25,8 +25,7 @@ Partial Class Form1
     'Do not modify it using the code editor.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
-        Me.components = New System.ComponentModel.Container()
-        Me.ThreeStateCheckBoxTreeView1 = New AdvTreeView()
+        Me.ThreeStateCheckBoxTreeView1 = New Windows.Forms.AdvTreeView()
         Me.SuspendLayout()
         '
         'ThreeStateCheckBoxTreeView1
@@ -47,7 +46,7 @@ Partial Class Form1
         Me.ClientSize = New System.Drawing.Size(702, 449)
         Me.Controls.Add(Me.ThreeStateCheckBoxTreeView1)
         Me.Name = "Form1"
-        Me.Text = "Three State CheckBox TreeView"
+        Me.Text = "VB Three State CheckBox TreeView"
         Me.ResumeLayout(False)
 
     End Sub
