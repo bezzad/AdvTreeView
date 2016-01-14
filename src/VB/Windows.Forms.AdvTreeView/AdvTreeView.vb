@@ -3,6 +3,7 @@ Imports System.ComponentModel
 Imports System.Drawing
 Imports System.Windows.Forms
 Imports System.Windows.Forms.VisualStyles
+Imports System.Threading.Tasks
 
 ''' <summary>
 ''' Provides a tree view control supporting three state checkboxes.
@@ -11,6 +12,13 @@ Public Class AdvTreeView
     Inherits TreeView
 
 #Region "Events"
+
+    ''' <summary>
+    ''' Validate node must checked or not ? and get not check cause message
+    ''' </summary>
+    ''' <param name="e">Current checked Node</param>
+    ''' <returns>Why must not check error message. if must checked and not any error then return null</returns>
+    Public Delegate Function NodeValidator(e As TreeNode) As String
 
     Public Delegate Sub CheckedChangedHandler(e As TreeViewEventArgs)
     Public Event CheckedChanged As CheckedChangedHandler
@@ -22,7 +30,8 @@ Public Class AdvTreeView
 
 #Region "Fields"
 
-    ReadOnly _ilStateImages As ImageList
+    Private ReadOnly _ilStateImages As ImageList
+    Private ReadOnly _errorNodes As List(Of String)
     Private _checkBoxesVisible As Boolean
     Private _preventCheckEvent As Boolean
 
@@ -35,6 +44,12 @@ Public Class AdvTreeView
     ''' of this control.
     ''' </summary>
     Public Sub New()
+        _errorNodes = New List(Of String)()
+        NodeErrorDuration = 3000
+        ErrorForeColor = Color.Crimson
+        ParentNodeSelectError = "Parent not selectable class!"
+        SiblingNodeSelectError = "The ({0}) is a selected sibling node was found!"
+
         _ilStateImages = New ImageList()
         ' first we create our state image
         Dim cbsState = CheckBoxState.UncheckedNormal
@@ -106,10 +121,97 @@ Public Class AdvTreeView
             Return m_CheckBoxesThreeState
         End Get
         Set(value As Boolean)
-            m_CheckBoxesThreeState = value
+            m_CheckBoxesThreeState = Value
         End Set
     End Property
     Private m_CheckBoxesThreeState As Boolean
+
+    ''' <summary>
+    ''' Gets or sets to no support multi sibling checks.
+    ''' </summary>
+    <Category("Appearance"), Description("Gets or sets to no support multi sibling checks."), DefaultValue(False)> _
+    Public Property SiblingLimitSelection() As Boolean
+        Get
+            Return m_SiblingLimitSelection
+        End Get
+        Set(value As Boolean)
+            m_SiblingLimitSelection = Value
+        End Set
+    End Property
+    Private m_SiblingLimitSelection As Boolean
+
+    ''' <summary>
+    ''' Gets or sets Parent select error message.
+    ''' </summary>
+    <Category("Appearance"), Description("Gets or sets Parent select error message.")> _
+    Public Property ParentNodeSelectError() As String
+        Get
+            Return m_ParentNodeSelectError
+        End Get
+        Set(value As String)
+            m_ParentNodeSelectError = Value
+        End Set
+    End Property
+    Private m_ParentNodeSelectError As String
+
+    ''' <summary>
+    ''' Gets or sets Sibling select error message.
+    ''' </summary>
+    <Category("Appearance"), Description("Gets or sets Sibling select error message.")> _
+    Public Property SiblingNodeSelectError() As String
+        Get
+            Return m_SiblingNodeSelectError
+        End Get
+        Set(value As String)
+            m_SiblingNodeSelectError = Value
+        End Set
+    End Property
+    Private m_SiblingNodeSelectError As String
+
+    ''' <summary>
+    ''' Gets or sets select error duration per millisecond.
+    ''' </summary>
+    <Category("Appearance"), Description("Gets or sets select error duration per millisecond.")> _
+    Public Property NodeErrorDuration() As Integer
+        Get
+            Return m_NodeErrorDuration
+        End Get
+        Set(value As Integer)
+            m_NodeErrorDuration = Value
+        End Set
+    End Property
+    Private m_NodeErrorDuration As Integer
+
+    ''' <summary>
+    ''' Gets or sets select error ForeColor.
+    ''' </summary>
+    <Category("Appearance"), Description("Gets or sets select error ForeColor.")> _
+    Public Property ErrorForeColor() As Color
+        Get
+            Return m_ErrorForeColor
+        End Get
+        Set(value As Color)
+            m_ErrorForeColor = Value
+        End Set
+    End Property
+    Private m_ErrorForeColor As Color
+
+    ''' <summary>
+    ''' TreeNode validator for define selected node must checked or not ? and get not check cause message
+    ''' </summary>
+    ''' <value>
+    ''' The check node validation.
+    ''' </value>
+    <Browsable(False)> _
+    Public Property CheckNodeValidation() As NodeValidator
+        Get
+            Return _mCheckNodeValidation
+        End Get
+        Set(value As NodeValidator)
+            _mCheckNodeValidation = value
+        End Set
+    End Property
+    Private _mCheckNodeValidation As NodeValidator
 
 #End Region
 
@@ -181,80 +283,207 @@ Public Class AdvTreeView
     Protected Overrides Sub OnNodeMouseClick(e As TreeNodeMouseClickEventArgs)
         MyBase.OnNodeMouseClick(e)
 
-        _preventCheckEvent = True
+        Try
+            _preventCheckEvent = True
 
-        Dim iSpacing As Integer = If(ImageList Is Nothing, 0, 18)
-        ' *not* used by the state
-        ' image we can leave here.
-        If (e.X > e.Node.Bounds.Left - iSpacing OrElse e.X < e.Node.Bounds.Left - (iSpacing + 16)) AndAlso e.Button <> MouseButtons.None Then
-            Return
-        End If
+            If Not e.Node.Checked AndAlso SiblingLimitSelection Then
+                ' not checked show before clicking mode and is not current state
+                If e.Node.GetNodeCount(False) > 0 Then
+                    ' is nested node ?
+                    e.Node.Checked = False
+                    SetError(e.Node, ParentNodeSelectError)
+                    Return
+                End If
 
-        Dim tnBuffer = e.Node
-        If e.Button = MouseButtons.Left Then
-            ' flip its check state.
-            tnBuffer.Checked = Not tnBuffer.Checked
-        End If
+                Dim sibling As TreeNode
+                If (InlineAssignHelper(sibling, e.Node.GetFirstCheckedSiblingNode())) IsNot Nothing Then
+                    ' check sibling selections
+                    e.Node.Checked = False
+                    SetError(e.Node, SiblingNodeSelectError, sibling.Text)
+                    Return
+                End If
 
-        ' set state image index
-        tnBuffer.StateImageIndex = If(tnBuffer.Checked, 1, tnBuffer.StateImageIndex)
-        ' correctly.
-        OnAfterCheck(New TreeViewEventArgs(tnBuffer, TreeViewAction.ByMouse))
-
-        Dim stNodes = New Stack(Of TreeNode)(tnBuffer.Nodes.Count)
-        stNodes.Push(tnBuffer)
-        ' push buffered node first.
-        Do
-            ' let's pop node from stack,
-            tnBuffer = stNodes.Pop()
-            ' inherit buffered node's
-            tnBuffer.Checked = e.Node.Checked
-            ' check state and push
-            tnBuffer.StateImageIndex = If(e.Node.Checked, 1, 0)
-            OnCheckedChanged(New TreeViewEventArgs(DirectCast(tnBuffer, TreeNode)))
-
-            For i As Integer = 0 To tnBuffer.Nodes.Count - 1
-                ' each child on the stack
-                stNodes.Push(tnBuffer.Nodes(i))
-                ' until there is no node
-            Next
-        Loop While stNodes.Count > 0
-        ' left.
-        Dim bMixedState = False
-        tnBuffer = e.Node
-        ' re-buffer clicked node.
-        While tnBuffer.Parent IsNot Nothing
-            ' while we get a parent we
-            For Each tnChild As TreeNode In tnBuffer.Parent.Nodes
-                ' determine mixed check states
-                ' and convert current check
-                bMixedState = bMixedState Or (tnChild.Checked <> tnBuffer.Checked Or tnChild.StateImageIndex = 2)
-            Next
-            ' state to state image index.
-            Dim iIndex = CInt(Convert.ToUInt32(tnBuffer.Checked))
-            tnBuffer.Parent.Checked = bMixedState OrElse (iIndex > 0)
-            ' state image in dependency
-            If bMixedState Then
-                ' of mixed state.
-                tnBuffer.Parent.StateImageIndex = If(CheckBoxesThreeState, 2, 1)
-            Else
-                tnBuffer.Parent.StateImageIndex = iIndex
+                If CheckNodeValidation IsNot Nothing Then
+                    Dim errorMsg As String = CheckNodeValidation(e.Node)
+                    If errorMsg IsNot Nothing Then
+                        e.Node.Checked = False
+                        SetError(e.Node, errorMsg)
+                        Return
+                    End If
+                End If
             End If
-            tnBuffer = tnBuffer.Parent
-            ' finally buffer parent and
-            OnCheckedChanged(New TreeViewEventArgs(DirectCast(tnBuffer, TreeNode)))
-        End While
-        ' loop here.
-        _preventCheckEvent = False
 
-        ' set this node StateImageIndex to 0 if not checked
-        If Not e.Node.Checked Then
-            e.Node.StateImageIndex = 0
-        End If
-        ' raise checked changed event
-        OnCheckedChanged(New TreeViewEventArgs(DirectCast(e.Node, TreeNode)))
+            Dim iSpacing As Integer = If(ImageList Is Nothing, 0, 18)
+            ' *not* used by the state
+            ' image we can leave here.
+            If (e.X > e.Node.Bounds.Left - iSpacing OrElse e.X < e.Node.Bounds.Left - (iSpacing + 16)) AndAlso e.Button <> MouseButtons.None Then
+                Return
+            End If
+
+            Dim tnBuffer = e.Node
+            If e.Button = MouseButtons.Left Then
+                ' flip its check state.
+                tnBuffer.Checked = Not tnBuffer.Checked
+            End If
+
+            ' set state image index
+            tnBuffer.StateImageIndex = If(tnBuffer.Checked, 1, tnBuffer.StateImageIndex)
+            ' correctly.
+            OnAfterCheck(New TreeViewEventArgs(tnBuffer, TreeViewAction.ByMouse))
+
+            Dim stNodes = New Stack(Of TreeNode)(tnBuffer.Nodes.Count)
+            stNodes.Push(tnBuffer)
+            ' push buffered node first.
+            Do
+                ' let's pop node from stack,
+                tnBuffer = stNodes.Pop()
+                ' inherit buffered node's
+                tnBuffer.Checked = e.Node.Checked
+                ' check state and push
+                tnBuffer.StateImageIndex = If(e.Node.Checked, 1, 0)
+                OnCheckedChanged(New TreeViewEventArgs(tnBuffer))
+
+                For i As Integer = 0 To tnBuffer.Nodes.Count - 1
+                    ' each child on the stack
+                    stNodes.Push(tnBuffer.Nodes(i))
+                    ' until there is no node
+                Next
+            Loop While stNodes.Count > 0
+            ' left.
+            Dim bMixedState = False
+            tnBuffer = e.Node
+            ' re-buffer clicked node.
+            While tnBuffer.Parent IsNot Nothing
+                ' while we get a parent we
+                For Each tnChild As TreeNode In tnBuffer.Parent.Nodes
+                    ' determine mixed check states
+                    ' and convert current check
+                    bMixedState = bMixedState Or (tnChild.Checked <> tnBuffer.Checked Or tnChild.StateImageIndex = 2)
+                Next
+                ' state to state image index.
+                Dim iIndex = CInt(Convert.ToUInt32(tnBuffer.Checked))
+                tnBuffer.Parent.Checked = bMixedState OrElse (iIndex > 0)
+                ' state image in dependency
+                If bMixedState Then
+                    ' of mixed state.
+                    tnBuffer.Parent.StateImageIndex = If(CheckBoxesThreeState, 2, 1)
+                Else
+                    tnBuffer.Parent.StateImageIndex = iIndex
+                End If
+                tnBuffer = tnBuffer.Parent
+                ' finally buffer parent and
+                OnCheckedChanged(New TreeViewEventArgs(tnBuffer))
+            End While
+            ' loop here.
+            ' set this node StateImageIndex to 0 if not checked
+            If Not e.Node.Checked Then
+                e.Node.StateImageIndex = 0
+            End If
+            ' raise checked changed event
+            OnCheckedChanged(New TreeViewEventArgs(e.Node))
+        Finally
+            _preventCheckEvent = False
+        End Try
     End Sub
+
+    Protected Async Sub SetError(node As TreeNode, errorText As String, ParamArray errorParams As Object())
+        SyncLock node
+            If _errorNodes.Contains(node.GetUniqueValue()) Then
+                Return
+            End If
+            _errorNodes.Add(node.GetUniqueValue())
+        End SyncLock
+
+        Try
+            Dim tBuffer = node.Text
+            Dim cBuffer = node.ForeColor
+
+            node.ForeColor = ErrorForeColor
+            node.Text += String.Format(" ({0})", String.Format(errorText, errorParams))
+
+            Await Task.Delay(NodeErrorDuration)
+
+            node.ForeColor = cBuffer
+            node.Text = tBuffer
+        Finally
+            _errorNodes.Remove(node.GetUniqueValue())
+        End Try
+    End Sub
+
+    Private Shared Function InlineAssignHelper(Of T)(ByRef target As T, value As T) As T
+        target = value
+        Return value
+    End Function
 
 #End Region
 
 End Class
+
+
+Public Module AdvTreeViewExtensions
+
+    <System.Runtime.CompilerServices.Extension> _
+    Public Function CheckState(node As TreeNode) As CheckBoxState
+        Select Case node.StateImageIndex
+            Case 0
+                Return CheckBoxState.UncheckedNormal
+            Case 1
+                Return CheckBoxState.CheckedNormal
+            Case 2
+                Return CheckBoxState.MixedNormal
+            Case Else
+                Return CheckBoxState.UncheckedNormal
+        End Select
+    End Function
+
+    <System.Runtime.CompilerServices.Extension> _
+    Public Function GetFirstCheckedSiblingNode(node As TreeNode) As TreeNode
+        While Not (node.Parent Is Nothing) AndAlso node.Parent.GetNodeCount(False) > 1
+            ' have sibling node except self?
+            For Each sibling As TreeNode In node.Parent.Nodes
+                If sibling.Index <> node.Index AndAlso sibling.CheckState() <> CheckBoxState.UncheckedNormal Then
+                    ' is sibling node not me and checked or mixed?
+                    Return sibling
+                End If
+            Next
+
+            ' check next time, this node parent sibling nodes
+            node = node.Parent
+        End While
+
+        Return Nothing
+    End Function
+
+    <System.Runtime.CompilerServices.Extension> _
+    Public Function GetCheckedSiblingsNode(node As TreeNode) As List(Of TreeNode)
+        Dim siblings = New List(Of TreeNode)()
+
+        While Not (node.Parent Is Nothing) AndAlso node.Parent.GetNodeCount(False) > 1
+            ' have sibling node except self?
+            For Each sibling As TreeNode In node.Parent.Nodes
+                If sibling.Index <> node.Index AndAlso sibling.CheckState() <> CheckBoxState.UncheckedNormal Then
+                    ' is sibling node not me and checked or mixed?
+                    siblings.Add(sibling)
+                End If
+            Next
+
+            ' check next time, this node parent sibling nodes
+            node = node.Parent
+        End While
+
+        Return siblings
+    End Function
+
+    <System.Runtime.CompilerServices.Extension> _
+    Friend Function GetUniqueValue(node As TreeNode) As String
+        Dim key As String = ""
+
+        While Not (node Is Nothing)
+            key += String.Format("\{0}", node.Index)
+            node = node.Parent
+        End While
+
+        Return key
+    End Function
+
+End Module

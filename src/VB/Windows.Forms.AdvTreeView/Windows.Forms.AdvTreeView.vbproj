@@ -62,8 +62,6 @@
     <Compile Include="AdvTreeView.vb">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="AdvTreeViewExtensions.vb" />
-    <Compile Include="CheckedState.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

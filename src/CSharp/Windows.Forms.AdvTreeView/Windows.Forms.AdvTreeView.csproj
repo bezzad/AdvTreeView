@@ -38,8 +38,6 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdvTreeViewExtensions.cs" />
-    <Compile Include="CheckedState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AdvTreeView.cs">
       <SubType>Component</SubType>

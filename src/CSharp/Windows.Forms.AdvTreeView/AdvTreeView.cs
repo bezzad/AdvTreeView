@@ -8,6 +8,7 @@ using System.Windows.Forms.VisualStyles;
 
 namespace Windows.Forms
 {
+
     /// <summary>
     /// Provides a tree view control supporting three state checkboxes.
     /// </summary>
@@ -20,7 +21,7 @@ namespace Windows.Forms
         /// </summary>
         /// <param name="e">Current checked Node</param>
         /// <returns>Why must not check error message. if must checked and not any error then return null</returns>
-        public delegate string NodeValidation(TreeNode e);
+        public delegate string NodeValidator(TreeNode e);
 
         public delegate void CheckedChangedHandler(TreeViewEventArgs e);
         public event CheckedChangedHandler CheckedChanged;
@@ -44,8 +45,7 @@ namespace Windows.Forms
         #region Constructors
 
         /// <summary>
-        /// Creates a new instance
-        /// of this control.
+        /// Creates a new instance of this control.
         /// </summary>
         public AdvTreeView()
         {
@@ -149,7 +149,7 @@ namespace Windows.Forms
         /// The check node validation.
         /// </value>
         [Browsable(false)]
-        public NodeValidation CheckNodeValidation { get; set; }
+        public NodeValidator CheckNodeValidation { get; set; }
 
         #endregion
 
@@ -334,5 +334,75 @@ namespace Windows.Forms
         }
 
         #endregion
+    }
+
+
+
+    public static class AdvTreeViewExtensions
+    {
+        public static CheckBoxState CheckState(this TreeNode node)
+        {
+            switch (node.StateImageIndex)
+            {
+                case 0: return CheckBoxState.UncheckedNormal;
+                case 1: return CheckBoxState.CheckedNormal;
+                case 2: return CheckBoxState.MixedNormal;
+                default:
+                    return CheckBoxState.UncheckedNormal;
+            }
+        }
+
+        public static TreeNode GetFirstCheckedSiblingNode(this TreeNode node)
+        {
+            while (node.Parent != null && node.Parent.GetNodeCount(false) > 1) // have sibling node except self?
+            {
+                foreach (TreeNode sibling in node.Parent.Nodes)
+                {
+                    if (sibling.Index != node.Index && sibling.CheckState() != CheckBoxState.UncheckedNormal)
+                    // is sibling node not me and checked or mixed?
+                    {
+                        return sibling;
+                    }
+                }
+
+                node = node.Parent; // check next time, this node parent sibling nodes
+            }
+
+            return null;
+        }
+
+        public static List<TreeNode> GetCheckedSiblingsNode(this TreeNode node)
+        {
+            var siblings = new List<TreeNode>();
+
+            while (node.Parent != null && node.Parent.GetNodeCount(false) > 1) // have sibling node except self?
+            {
+                foreach (TreeNode sibling in node.Parent.Nodes)
+                {
+                    if (sibling.Index != node.Index && sibling.CheckState() != CheckBoxState.UncheckedNormal)
+                    // is sibling node not me and checked or mixed?
+                    {
+                        siblings.Add(sibling);
+                    }
+                }
+
+                node = node.Parent; // check next time, this node parent sibling nodes
+            }
+
+            return siblings;
+        }
+
+        internal static string GetUniqueValue(this TreeNode node)
+        {
+            string key = "";
+
+            while (node != null)
+            {
+                key += string.Format(@"\{0}", node.Index);
+                node = node.Parent;
+            }
+
+            return key;
+        }
     }
 }

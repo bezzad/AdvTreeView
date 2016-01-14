@@ -4,13 +4,18 @@ using Windows.Forms;
 
 namespace CSharpWinFormSample
 {
-    public partial class Form1 : Form
+    public partial class TestForm : Form
     {
-        public Form1()
+        public TestForm()
         {
             InitializeComponent();
 
             advTree.CheckedChanged += advTree_CheckedChanged;
+            chkSiblingCheckLimitation.CheckedChanged += chkSiblingCheckLimitation_CheckedChanged;
+            numErrorDuration.ValueChanged += numErrorDuration_ValueChanged;
+            txtSiblingSelectError.TextChanged += txtSiblingSelectError_TextChanged;
+            txtParentSelectError.TextChanged += txtParentSelectError_TextChanged;
+
             txtParentSelectError.Text = advTree.ParentNodeSelectError;
             txtSiblingSelectError.Text = advTree.SiblingNodeSelectError;
             numErrorDuration.Value = 3000;

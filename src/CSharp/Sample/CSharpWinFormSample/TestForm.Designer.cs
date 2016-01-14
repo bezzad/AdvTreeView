@@ -1,6 +1,6 @@
 ﻿namespace CSharpWinFormSample
 {
-    partial class Form1
+    partial class TestForm
     {
         /// <summary>
         /// Required designer variable.
@@ -50,7 +50,6 @@
             this.chkSiblingCheckLimitation.TabIndex = 1;
             this.chkSiblingCheckLimitation.Text = "Sibling Check Limitation";
             this.chkSiblingCheckLimitation.UseVisualStyleBackColor = true;
-            this.chkSiblingCheckLimitation.CheckedChanged += new System.EventHandler(this.chkSiblingCheckLimitation_CheckedChanged);
             // 
             // txtParentSelectError
             // 
@@ -59,7 +58,6 @@
             this.txtParentSelectError.Name = "txtParentSelectError";
             this.txtParentSelectError.Size = new System.Drawing.Size(427, 20);
             this.txtParentSelectError.TabIndex = 2;
-            this.txtParentSelectError.TextChanged += new System.EventHandler(this.txtParentSelectError_TextChanged);
             // 
             // label1
             // 
@@ -88,17 +86,19 @@
             this.txtSiblingSelectError.Name = "txtSiblingSelectError";
             this.txtSiblingSelectError.Size = new System.Drawing.Size(427, 20);
             this.txtSiblingSelectError.TabIndex = 4;
-            this.txtSiblingSelectError.TextChanged += new System.EventHandler(this.txtSiblingSelectError_TextChanged);
             // 
             // numErrorDuration
             // 
             this.numErrorDuration.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.numErrorDuration.Location = new System.Drawing.Point(421, 301);
-            this.numErrorDuration.Maximum = 100000;
+            this.numErrorDuration.Maximum = new decimal(new int[] {
+            100000,
+            0,
+            0,
+            0});
             this.numErrorDuration.Name = "numErrorDuration";
             this.numErrorDuration.Size = new System.Drawing.Size(120, 20);
             this.numErrorDuration.TabIndex = 6;
-            this.numErrorDuration.ValueChanged += new System.EventHandler(this.numErrorDuration_ValueChanged);
             // 
             // label3
             // 
@@ -116,12 +116,16 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.advTree.CheckBoxes = true;
+            this.advTree.CheckNodeValidation = null;
+            this.advTree.ErrorForeColor = System.Drawing.Color.Crimson;
             this.advTree.FullRowSelect = true;
             this.advTree.Indent = 30;
             this.advTree.Location = new System.Drawing.Point(-2, 1);
             this.advTree.Name = "advTree";
             this.advTree.NodeErrorDuration = 0;
+            this.advTree.ParentNodeSelectError = "Parent not selectable class!";
             this.advTree.ShowNodeToolTips = true;
+            this.advTree.SiblingNodeSelectError = "The ({0}) is a selected sibling node was found!";
             this.advTree.Size = new System.Drawing.Size(553, 295);
             this.advTree.TabIndex = 0;
             // 
