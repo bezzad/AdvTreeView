@@ -121,7 +121,7 @@ Public Class AdvTreeView
             Return m_CheckBoxesThreeState
         End Get
         Set(value As Boolean)
-            m_CheckBoxesThreeState = Value
+            m_CheckBoxesThreeState = value
         End Set
     End Property
     Private m_CheckBoxesThreeState As Boolean
@@ -135,7 +135,7 @@ Public Class AdvTreeView
             Return m_SiblingLimitSelection
         End Get
         Set(value As Boolean)
-            m_SiblingLimitSelection = Value
+            m_SiblingLimitSelection = value
         End Set
     End Property
     Private m_SiblingLimitSelection As Boolean
@@ -149,7 +149,7 @@ Public Class AdvTreeView
             Return m_ParentNodeSelectError
         End Get
         Set(value As String)
-            m_ParentNodeSelectError = Value
+            m_ParentNodeSelectError = value
         End Set
     End Property
     Private m_ParentNodeSelectError As String
@@ -163,7 +163,7 @@ Public Class AdvTreeView
             Return m_SiblingNodeSelectError
         End Get
         Set(value As String)
-            m_SiblingNodeSelectError = Value
+            m_SiblingNodeSelectError = value
         End Set
     End Property
     Private m_SiblingNodeSelectError As String
@@ -177,7 +177,7 @@ Public Class AdvTreeView
             Return m_NodeErrorDuration
         End Get
         Set(value As Integer)
-            m_NodeErrorDuration = Value
+            m_NodeErrorDuration = value
         End Set
     End Property
     Private m_NodeErrorDuration As Integer
@@ -191,7 +191,7 @@ Public Class AdvTreeView
             Return m_ErrorForeColor
         End Get
         Set(value As Color)
-            m_ErrorForeColor = Value
+            m_ErrorForeColor = value
         End Set
     End Property
     Private m_ErrorForeColor As Color
@@ -402,6 +402,8 @@ Public Class AdvTreeView
             node.Text += String.Format(" ({0})", String.Format(errorText, errorParams))
 
             Await Task.Delay(NodeErrorDuration)
+
+            If (Not Me.IsHandleCreated) Then Return
 
             node.ForeColor = cBuffer
             node.Text = tBuffer

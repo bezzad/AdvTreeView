@@ -324,6 +324,8 @@ namespace Windows.Forms
 
                 await Task.Delay(NodeErrorDuration);
 
+                if(!this.IsHandleCreated) return;
+                
                 node.ForeColor = cBuffer;
                 node.Text = tBuffer;
             }
