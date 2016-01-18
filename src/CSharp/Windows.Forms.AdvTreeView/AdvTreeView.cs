@@ -334,7 +334,7 @@ namespace Windows.Forms
                 var cBuffer = node.ForeColor;
 
                 node.ForeColor = ErrorForeColor;
-                node.Text += string.Format(" ({0})", string.Format(errorText, errorParams));
+                node.Text = string.Format("({0})    {1}", string.Format(errorText, errorParams), node.Text);
 
                 await Task.Delay(NodeErrorDuration);
 
@@ -358,7 +358,7 @@ namespace Windows.Forms
 
         public void AddRange(TreeNode[] nodeArray)
         {
-            foreach (var node in nodeArray)
+            foreach (TreeNode node in nodeArray)
             {
                 this.Nodes.Add(node);
                 OnNodeAdded(new TreeViewEventArgs(node));
@@ -447,7 +447,7 @@ namespace Windows.Forms
         {
             var tree = (AdvTreeView)node.TreeView;
 
-            foreach (var newNode in newNodes)
+            foreach (TreeNode newNode in newNodes)
             {
                 node.Nodes.Add(newNode);
                 if (tree != null) tree.PerformNodeAdded(newNode);
