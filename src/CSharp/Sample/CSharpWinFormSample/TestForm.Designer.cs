@@ -129,7 +129,7 @@
             this.advTree.Size = new System.Drawing.Size(553, 295);
             this.advTree.TabIndex = 0;
             // 
-            // Form1
+            // TestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -142,7 +142,7 @@
             this.Controls.Add(this.txtParentSelectError);
             this.Controls.Add(this.chkSiblingCheckLimitation);
             this.Controls.Add(this.advTree);
-            this.Name = "Form1";
+            this.Name = "TestForm";
             this.Text = "C# Three State CheckBox TreeView";
             ((System.ComponentModel.ISupportInitialize)(this.numErrorDuration)).EndInit();
             this.ResumeLayout(false);

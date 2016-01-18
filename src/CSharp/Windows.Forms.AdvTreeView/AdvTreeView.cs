@@ -334,7 +334,7 @@ namespace Windows.Forms
                 var cBuffer = node.ForeColor;
 
                 node.ForeColor = ErrorForeColor;
-                node.Text = string.Format("({0})    {1}", string.Format(errorText, errorParams), node.Text);
+                node.Text = String.Format("{1}    ({0})", String.Format(errorText, errorParams), node.Text);
 
                 await Task.Delay(NodeErrorDuration);
 

@@ -408,7 +408,7 @@ Public Class AdvTreeView
             Dim cBuffer = node.ForeColor
 
             node.ForeColor = ErrorForeColor
-            node.Text = String.Format("({0})    {1}", String.Format(errorText, errorParams), node.Text)
+            node.Text = String.Format("{1}    ({0})", String.Format(errorText, errorParams), node.Text)
 
             Await Task.Delay(NodeErrorDuration)
 
