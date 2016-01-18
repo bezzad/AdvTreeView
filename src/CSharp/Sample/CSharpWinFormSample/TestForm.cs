@@ -31,14 +31,16 @@ namespace CSharpWinFormSample
             var treeNode3 = new TreeNode("Node8");
             var treeNode4 = new TreeNode("Node9");
             var treeNode5 = new TreeNode("Node10");
-            var treeNode6 = new TreeNode("Node6", new[]
+            var treeNode6 = new TreeNode("Node6");
+            treeNode6.AddRangeNodes(new TreeNode[]
             {
                 treeNode3,
                 treeNode4,
                 treeNode5
             });
             var treeNode7 = new TreeNode("Node7");
-            var treeNode8 = new TreeNode("Node1", new[]
+            var treeNode8 = new TreeNode("Node1");
+            treeNode8.AddRangeNodes(new TreeNode[]
             {
                 treeNode2,
                 treeNode6,
@@ -50,25 +52,29 @@ namespace CSharpWinFormSample
             var treeNode12 = new TreeNode("Node14");
             var treeNode13 = new TreeNode("Node19");
             var treeNode14 = new TreeNode("Node20");
-            var treeNode15 = new TreeNode("Node17", new[]
+            var treeNode15 = new TreeNode("Node17");
+            treeNode15.AddRangeNodes(new TreeNode[]
             {
                 treeNode13,
                 treeNode14
             });
             var treeNode16 = new TreeNode("Node18");
-            var treeNode17 = new TreeNode("Node15", new[]
+            var treeNode17 = new TreeNode("Node15");
+            treeNode17.AddRangeNodes(new TreeNode[]
             {
                 treeNode15,
                 treeNode16
             });
             var treeNode18 = new TreeNode("Node16");
-            var treeNode19 = new TreeNode("Node13", new[]
+            var treeNode19 = new TreeNode("Node13");
+            treeNode19.AddRangeNodes(new TreeNode[]
             {
                 treeNode12,
                 treeNode17,
                 treeNode18
             });
-            var treeNode20 = new TreeNode("Node3", new[]
+            var treeNode20 = new TreeNode("Node3");
+            treeNode20.AddRangeNodes(new TreeNode[]
             {
                 treeNode10,
                 treeNode11,
@@ -120,7 +126,7 @@ namespace CSharpWinFormSample
             treeNode21.Text = "Node4";
 
 
-            advTree.Nodes.AddRange(new TreeNode[]
+            advTree.AddRange(new TreeNode[]
             {
                 treeNode1,
                 treeNode8,
@@ -128,12 +134,6 @@ namespace CSharpWinFormSample
                 treeNode20,
                 treeNode21
             });
-
-            foreach (TreeNode node in advTree.Nodes)
-            {
-                node.Checked = false;
-            }
-
         }
 
 

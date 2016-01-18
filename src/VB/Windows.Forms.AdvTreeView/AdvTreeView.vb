@@ -1,9 +1,10 @@
 ﻿Imports System.Collections.Generic
 Imports System.ComponentModel
 Imports System.Drawing
+Imports System.Threading.Tasks
 Imports System.Windows.Forms
 Imports System.Windows.Forms.VisualStyles
-Imports System.Threading.Tasks
+
 
 ''' <summary>
 ''' Provides a tree view control supporting three state checkboxes.
@@ -26,6 +27,17 @@ Public Class AdvTreeView
         RaiseEvent CheckedChanged(e)
     End Sub
 
+    Public Delegate Sub NodeAddedHandler(e As TreeViewEventArgs)
+    Public Event NodeAdded As NodeAddedHandler
+    Protected Overridable Sub OnNodeAdded(e As TreeViewEventArgs)
+        e.Node.Checked = e.Node.Checked
+        RaiseEvent NodeAdded(e)
+    End Sub
+
+    Friend Sub PerformNodeAdded(node As TreeNode)
+        OnNodeAdded(New TreeViewEventArgs(node))
+    End Sub
+
 #End Region
 
 #Region "Fields"
@@ -40,8 +52,7 @@ Public Class AdvTreeView
 #Region "Constructors"
 
     ''' <summary>
-    ''' Creates a new instance
-    ''' of this control.
+    ''' Creates a new instance of this control.
     ''' </summary>
     Public Sub New()
         _errorNodes = New List(Of String)()
@@ -104,97 +115,42 @@ Public Class AdvTreeView
 
     <Browsable(False)> _
     Public Shadows Property StateImageList() As ImageList
-        Get
-            Return MyBase.StateImageList
-        End Get
-        Set(value As ImageList)
-            MyBase.StateImageList = value
-        End Set
-    End Property
 
     ''' <summary>
     ''' Gets or sets to support three state in the checkboxes or not.
     ''' </summary>
     <Category("Appearance"), Description("Sets tree view to use three state checkboxes or not."), DefaultValue(True)> _
     Public Property CheckBoxesThreeState() As Boolean
-        Get
-            Return m_CheckBoxesThreeState
-        End Get
-        Set(value As Boolean)
-            m_CheckBoxesThreeState = value
-        End Set
-    End Property
-    Private m_CheckBoxesThreeState As Boolean
 
     ''' <summary>
     ''' Gets or sets to no support multi sibling checks.
     ''' </summary>
     <Category("Appearance"), Description("Gets or sets to no support multi sibling checks."), DefaultValue(False)> _
     Public Property SiblingLimitSelection() As Boolean
-        Get
-            Return m_SiblingLimitSelection
-        End Get
-        Set(value As Boolean)
-            m_SiblingLimitSelection = value
-        End Set
-    End Property
-    Private m_SiblingLimitSelection As Boolean
 
     ''' <summary>
     ''' Gets or sets Parent select error message.
     ''' </summary>
     <Category("Appearance"), Description("Gets or sets Parent select error message.")> _
     Public Property ParentNodeSelectError() As String
-        Get
-            Return m_ParentNodeSelectError
-        End Get
-        Set(value As String)
-            m_ParentNodeSelectError = value
-        End Set
-    End Property
-    Private m_ParentNodeSelectError As String
 
     ''' <summary>
     ''' Gets or sets Sibling select error message.
     ''' </summary>
     <Category("Appearance"), Description("Gets or sets Sibling select error message.")> _
     Public Property SiblingNodeSelectError() As String
-        Get
-            Return m_SiblingNodeSelectError
-        End Get
-        Set(value As String)
-            m_SiblingNodeSelectError = value
-        End Set
-    End Property
-    Private m_SiblingNodeSelectError As String
 
     ''' <summary>
     ''' Gets or sets select error duration per millisecond.
     ''' </summary>
     <Category("Appearance"), Description("Gets or sets select error duration per millisecond.")> _
     Public Property NodeErrorDuration() As Integer
-        Get
-            Return m_NodeErrorDuration
-        End Get
-        Set(value As Integer)
-            m_NodeErrorDuration = value
-        End Set
-    End Property
-    Private m_NodeErrorDuration As Integer
 
     ''' <summary>
     ''' Gets or sets select error ForeColor.
     ''' </summary>
     <Category("Appearance"), Description("Gets or sets select error ForeColor.")> _
     Public Property ErrorForeColor() As Color
-        Get
-            Return m_ErrorForeColor
-        End Get
-        Set(value As Color)
-            m_ErrorForeColor = value
-        End Set
-    End Property
-    Private m_ErrorForeColor As Color
 
     ''' <summary>
     ''' TreeNode validator for define selected node must checked or not ? and get not check cause message
@@ -204,14 +160,6 @@ Public Class AdvTreeView
     ''' </value>
     <Browsable(False)> _
     Public Property CheckNodeValidation() As NodeValidator
-        Get
-            Return _mCheckNodeValidation
-        End Get
-        Set(value As NodeValidator)
-            _mCheckNodeValidation = value
-        End Set
-    End Property
-    Private _mCheckNodeValidation As NodeValidator
 
 #End Region
 
@@ -403,7 +351,9 @@ Public Class AdvTreeView
 
             Await Task.Delay(NodeErrorDuration)
 
-            If (Not Me.IsHandleCreated) Then Return
+            If Not Me.IsHandleCreated Then
+                Return
+            End If
 
             node.ForeColor = cBuffer
             node.Text = tBuffer
@@ -412,6 +362,18 @@ Public Class AdvTreeView
         End Try
     End Sub
 
+    Public Function Add(node As TreeNode) As TreeNode
+        Me.Nodes.Add(node)
+        OnNodeAdded(New TreeViewEventArgs(node))
+        Return node
+    End Function
+
+    Public Sub AddRange(nodeArray As TreeNode())
+        For Each node In nodeArray
+            Me.Nodes.Add(node)
+            OnNodeAdded(New TreeViewEventArgs(node))
+        Next
+    End Sub
     Private Shared Function InlineAssignHelper(Of T)(ByRef target As T, value As T) As T
         target = value
         Return value
@@ -440,7 +402,7 @@ Public Module AdvTreeViewExtensions
 
     <System.Runtime.CompilerServices.Extension> _
     Public Function GetFirstCheckedSiblingNode(node As TreeNode) As TreeNode
-        While Not (node.Parent Is Nothing) AndAlso node.Parent.GetNodeCount(False) > 1
+        While node.Parent IsNot Nothing AndAlso node.Parent.GetNodeCount(False) > 1
             ' have sibling node except self?
             For Each sibling As TreeNode In node.Parent.Nodes
                 If sibling.Index <> node.Index AndAlso sibling.CheckState() <> CheckBoxState.UncheckedNormal Then
@@ -460,7 +422,7 @@ Public Module AdvTreeViewExtensions
     Public Function GetCheckedSiblingsNode(node As TreeNode) As List(Of TreeNode)
         Dim siblings = New List(Of TreeNode)()
 
-        While Not (node.Parent Is Nothing) AndAlso node.Parent.GetNodeCount(False) > 1
+        While node.Parent IsNot Nothing AndAlso node.Parent.GetNodeCount(False) > 1
             ' have sibling node except self?
             For Each sibling As TreeNode In node.Parent.Nodes
                 If sibling.Index <> node.Index AndAlso sibling.CheckState() <> CheckBoxState.UncheckedNormal Then
@@ -480,12 +442,30 @@ Public Module AdvTreeViewExtensions
     Friend Function GetUniqueValue(node As TreeNode) As String
         Dim key As String = ""
 
-        While Not (node Is Nothing)
+        While node IsNot Nothing
             key += String.Format("\{0}", node.Index)
             node = node.Parent
         End While
 
         Return key
     End Function
+
+    <System.Runtime.CompilerServices.Extension> _
+    Public Function AddNode(node As TreeNode, newNode As TreeNode) As TreeNode
+        Dim tree = DirectCast(node.TreeView, AdvTreeView)
+        node.Nodes.Add(newNode)
+        If (tree IsNot Nothing) Then tree.PerformNodeAdded(newNode)
+        Return newNode
+    End Function
+
+    <System.Runtime.CompilerServices.Extension> _
+    Public Sub AddRangeNodes(node As TreeNode, newNodes As TreeNode())
+        Dim tree = DirectCast(node.TreeView, AdvTreeView)
+
+        For Each newNode In newNodes
+            node.Nodes.Add(newNode)
+            If (tree IsNot Nothing) Then tree.PerformNodeAdded(newNode)
+        Next
+    End Sub
 
 End Module

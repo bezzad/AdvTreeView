@@ -31,6 +31,20 @@ namespace Windows.Forms
             if (handler != null) handler(e);
         }
 
+        public delegate void NodeAddedHandler(TreeViewEventArgs e);
+        public event NodeAddedHandler NodeAdded;
+        protected virtual void OnNodeAdded(TreeViewEventArgs e)
+        {
+            e.Node.Checked = e.Node.Checked;
+            NodeAddedHandler handler = NodeAdded;
+            if (handler != null) handler(e);
+        }
+
+        internal void PerformNodeAdded(TreeNode node)
+        {
+            OnNodeAdded(new TreeViewEventArgs(node));
+        }
+
         #endregion
 
         #region Fields
@@ -75,7 +89,7 @@ namespace Windows.Forms
                 CheckBoxesThreeState = true;
             }
         }
-        
+
         #endregion
 
         #region Properties
@@ -324,8 +338,8 @@ namespace Windows.Forms
 
                 await Task.Delay(NodeErrorDuration);
 
-                if(!this.IsHandleCreated) return;
-                
+                if (!this.IsHandleCreated) return;
+
                 node.ForeColor = cBuffer;
                 node.Text = tBuffer;
             }
@@ -335,9 +349,24 @@ namespace Windows.Forms
             }
         }
 
+        public TreeNode Add(TreeNode node)
+        {
+            this.Nodes.Add(node);
+            OnNodeAdded(new TreeViewEventArgs(node));
+            return node;
+        }
+
+        public void AddRange(TreeNode[] nodeArray)
+        {
+            foreach (var node in nodeArray)
+            {
+                this.Nodes.Add(node);
+                OnNodeAdded(new TreeViewEventArgs(node));
+            }
+        }
+
         #endregion
     }
-
 
 
     public static class AdvTreeViewExtensions
@@ -405,6 +434,24 @@ namespace Windows.Forms
             }
 
             return key;
+        }
+
+        public static TreeNode AddNode(this TreeNode node, TreeNode newNode)
+        {
+            var tree = (AdvTreeView)node.TreeView;
+            node.Nodes.Add(newNode);
+            if (tree != null) tree.PerformNodeAdded(newNode);
+            return newNode;
+        }
+        public static void AddRangeNodes(this TreeNode node, TreeNode[] newNodes)
+        {
+            var tree = (AdvTreeView)node.TreeView;
+
+            foreach (var newNode in newNodes)
+            {
+                node.Nodes.Add(newNode);
+                if (tree != null) tree.PerformNodeAdded(newNode);
+            }
         }
     }
 }
